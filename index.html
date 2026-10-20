@@ -1,0 +1,272 @@
+<html lang="es"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadmap Ejecución Acuerdos Soluciones</title>
+    <style>
+        :root {
+            --slate-900: #0f172a;
+            --slate-800: #1e293b;
+            --slate-700: #334155;
+            --slate-600: #475569;
+            --slate-500: #64748b;
+            --slate-400: #94a3b8;
+            --slate-300: #cbd5e1;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --teal-600: #0d9488;
+            --teal-500: #14b8a6;
+            --blue-600: #2563eb;
+            --violet-600: #7c3aed;
+            --sky-600: #0284c7;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: var(--slate-100); color: var(--slate-800); padding: 2.5rem 1rem; min-height: 100vh; }
+        .container { max-width: 1050px; margin: 0 auto; background: #ffffff; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08); overflow: hidden; border: 1px solid var(--slate-200); }
+
+        header { background-color: var(--slate-900); color: #ffffff; padding: 2.25rem 2.5rem; border-bottom: 3px solid var(--teal-600); }
+        .header-title-wrapper { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.5rem; }
+        .header-icon { width: 28px; height: 28px; stroke: var(--teal-500); stroke-width: 2.2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .header-title { font-size: 1.65rem; font-weight: 800; color: #ffffff; }
+        .header-subtitle { font-size: 0.925rem; color: var(--slate-400); line-height: 1.5; margin-left: 2.4rem; }
+
+        .progress-section { background-color: var(--slate-800); padding: 1.25rem 2.5rem; display: flex; align-items: center; gap: 1.5rem; }
+        .progress-label { color: #ffffff; font-weight: 700; font-size: 0.825rem; text-transform: uppercase; letter-spacing: 0.06em; }
+        .progress-bar-container { flex: 1; background-color: var(--slate-700); height: 12px; border-radius: 999px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--teal-500), var(--blue-600)); width: 0%; transition: width 0.4s ease; }
+        .progress-text { color: #ffffff; font-weight: 700; font-size: 0.9rem; min-width: 120px; text-align: right; }
+
+        .sync-status { display: flex; align-items: center; gap: 0.5rem; font-size: 0.775rem; color: #94a3b8; background-color: rgba(255, 255, 255, 0.05); padding: 0.3rem 0.75rem; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .sync-dot { width: 8px; height: 8px; border-radius: 50%; background-color: #10b981; }
+
+        .tabs-nav { display: flex; background-color: var(--slate-50); border-bottom: 1px solid var(--slate-200); overflow-x: auto; }
+        .tab-button { flex: 1; padding: 1.1rem 1.25rem; border: none; background: none; font-size: 0.875rem; font-weight: 600; color: var(--slate-600); cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s ease; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+        .tab-icon { width: 18px; height: 18px; stroke: var(--slate-500); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+        .tab-button.active { color: var(--teal-600); border-bottom-color: var(--teal-600); background-color: #ffffff; }
+        .tab-button.active .tab-icon { stroke: var(--teal-600); }
+        .tab-badge { background-color: var(--slate-200); color: var(--slate-700); font-size: 0.725rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700; }
+        .tab-button.active .tab-badge { background-color: #ccfbf1; color: #0f766e; }
+
+        .tab-content { display: none; padding: 2.25rem 2.5rem; }
+        .tab-content.active { display: block !important; }
+
+        .section-header { margin-bottom: 1.75rem; }
+        .section-title { font-size: 1.2rem; font-weight: 700; color: var(--slate-900); }
+        .section-desc { font-size: 0.875rem; color: var(--slate-500); }
+
+        .checklist-group { display: flex; flex-direction: column; gap: 1.1rem; }
+        .check-item { display: flex; align-items: flex-start; gap: 1.25rem; padding: 1.25rem; border: 1px solid var(--slate-200); border-radius: 12px; background-color: #ffffff; cursor: pointer; transition: all 0.25s ease; position: relative; }
+        .check-item:hover { border-color: var(--slate-300); box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.04); }
+        .check-item.completed { background-color: var(--slate-50); }
+        .check-item.completed .item-title { text-decoration: line-through; color: var(--slate-400); }
+
+        .circle-checkbox { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--slate-300); background-color: #ffffff; display: flex; align-items: center; justify-content: center; margin-top: 2px; flex-shrink: 0; transition: all 0.25s ease; }
+        .check-item.completed .circle-checkbox { background-color: var(--teal-600); border-color: var(--teal-600); transform: scale(1.05); }
+        .check-mark-svg { width: 14px; height: 14px; stroke: #ffffff; stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0; }
+        .check-item.completed .check-mark-svg { opacity: 1; }
+
+        @keyframes sparklePulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.6); }
+            70% { box-shadow: 0 0 0 14px rgba(13, 148, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0); }
+        }
+        .check-item.just-completed .circle-checkbox { animation: sparklePulse 0.6s ease-out; }
+
+        .item-body { flex: 1; }
+        .item-header-meta { display: flex; align-items: center; gap: 0.55rem; margin-bottom: 0.45rem; flex-wrap: wrap; }
+        .item-title { font-weight: 700; font-size: 1rem; color: var(--slate-900); }
+        .tag { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.55rem; border-radius: 6px; text-transform: uppercase; }
+        .tag-laura { background-color: #f3e8ff; color: var(--violet-600); }
+        .tag-dani { background-color: #e0f2fe; color: var(--sky-600); }
+        .tag-conjunto { background-color: #ccfbf1; color: #0f766e; }
+        .tag-date { background-color: var(--slate-100); color: var(--slate-600); font-weight: 600; }
+        .item-desc { font-size: 0.825rem; color: var(--slate-500); line-height: 1.55; }
+
+        footer { padding: 1.5rem 2.5rem; background-color: var(--slate-50); border-top: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; font-size: 0.825rem; color: var(--slate-500); }
+        .btn-reset { padding: 0.45rem 0.9rem; background-color: #ffffff; border: 1px solid var(--slate-300); border-radius: 6px; color: var(--slate-700); font-size: 0.775rem; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-title-wrapper">
+            <svg class="header-icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <h1 class="header-title">Roadmap Ejecución Acuerdos Soluciones</h1>
+        </div>
+        <div class="header-subtitle">Plan operativo interactivo en vivo (Laura &amp; Dani) para la alineación del mix de ventas 70/30.</div>
+    </header>
+
+    <div class="progress-section">
+        <span class="progress-label">Evolución Global:</span>
+        <div class="progress-bar-container"><div class="progress-bar-fill" id="progressBar"></div></div>
+        <div class="progress-text" id="progressText">0 / 0 (0%)</div>
+        <div class="sync-status"><div class="sync-dot"></div> <span id="syncText">Sincronizando...</span></div>
+    </div>
+
+    <nav class="tabs-nav">
+        <button class="tab-button active" data-tab="tab1"><svg class="tab-icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg> Sprint Inmediato <span class="tab-badge" id="badge-tab1">0/4</span></button>
+        <button class="tab-button" data-tab="tab2"><svg class="tab-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg> Setup CRM <span class="tab-badge" id="badge-tab2">0/5</span></button>
+        <button class="tab-button" data-tab="tab3"><svg class="tab-icon" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg> App Solutions Pulse <span class="tab-badge" id="badge-tab3">0/3</span></button>
+        <button class="tab-button" data-tab="tab4"><svg class="tab-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg> Despliegue Regional <span class="tab-badge" id="badge-tab4">0/3</span></button>
+    </nav>
+
+    <!-- TAB 1 -->
+    <div id="tab1" class="tab-content active">
+        <div class="section-header"><h2 class="section-title">Sprint Inmediato (Octubre 20 - 23, 2026)</h2></div>
+        <div class="checklist-group">
+            <div class="check-item" id="item_t1_1" onclick="toggleCheck('t1_1')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-laura">Laura</span><span class="tag tag-date">Oct 21</span><span class="item-title">Matriz de Precios Paquetizados</span></div><div class="item-desc">Recopilar con el equipo de Soluciones el catálogo de precios paquetizados, modelos de cobro y componentes de AWS asociados.</div></div></div>
+            <div class="check-item" id="item_t1_2" onclick="toggleCheck('t1_2')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-laura">Laura</span><span class="tag tag-date">Oct 22</span><span class="item-title">Análisis de Google Drive con Quick</span></div><div class="item-desc">Procesar la documentación comercial y técnica de Soluciones almacenada en Google Drive utilizando Quick para estructurar rangos de precio.</div></div></div>
+            <div class="check-item" id="item_t1_3" onclick="toggleCheck('t1_3')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-laura">Laura</span><span class="tag tag-date">Oct 22</span><span class="item-title">Assessment Inicial del Pipeline</span></div><div class="item-desc">Diagnosticar el estado actual de los deals en el pipeline comercial para determinar el porcentaje base real de soluciones paquetizadas.</div></div></div>
+            <div class="check-item" id="item_t1_4" onclick="toggleCheck('t1_4')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-dani">Dani</span><span class="tag tag-date">Oct 23</span><span class="item-title">Plan de Trabajo &amp; Presentación Ejecutiva</span></div><div class="item-desc">Unificar el plan operativo y los primeros hallazgos en la presentación oficial que se expondrá en la alineación global.</div></div></div>
+        </div>
+    </div>
+
+    <!-- TAB 2 -->
+    <div id="tab2" class="tab-content">
+        <div class="section-header"><h2 class="section-title">Setup Técnico en HubSpot &amp; Quick (Laura Izarra)</h2></div>
+        <div class="checklist-group">
+            <div class="check-item" id="item_t2_1" onclick="toggleCheck('t2_1')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-laura">Laura</span><span class="tag tag-date">Oct 24 - Oct 28</span><span class="item-title">1. Baseline del Registro</span></div><div class="item-desc">Depurar el pipeline comercial y ajustar los campos del formulario de registro de oportunidades.</div></div></div>
+            <div class="check-item" id="item_t2_2" onclick="toggleCheck('t2_2')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-laura">Laura</span><span class="tag tag-date">Oct 29 - Nov 01</span><span class="item-title">2. Tags y Workflows en HubSpot</span></div><div class="item-desc">Crear la taxonomía de etiquetas automáticas por línea de solución (Squads, Security, FinOps, Epics, Compliance).</div></div></div>
+            <div class="check-item" id="item_t2_3" onclick="toggleCheck('t2_3')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-laura">Laura</span><span class="tag tag-date">Nov 02 - Nov 04</span><span class="item-title">3. Reglas de Validación de Deals</span></div><div class="item-desc">Habilitar controles que verifiquen que el monto comercial, alcance y productos AWS coincidan estrictamente.</div></div></div>
+            <div class="check-item" id="item_t2_4" onclick="toggleCheck('t2_4')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-laura">Laura</span><span class="tag tag-date">Nov 05</span><span class="item-title">4. Dashboards de Seguimiento Semanal</span></div><div class="item-desc">Construir tableros de control ejecutivos para rastrear periódicamente los 3 KPIs críticos (Deals, Net Revenue, Ticket Medio).</div></div></div>
+            <div class="check-item" id="item_t2_5" onclick="toggleCheck('t2_5')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-conjunto">Laura &amp; Dani</span><span class="tag tag-date">Nov 06</span><span class="item-title">5. Respaldo CEO (Townhall)</span></div><div class="item-desc">Preparar el material gráfico y métricas para la sesión corporativa del CEO.</div></div></div>
+        </div>
+    </div>
+
+    <!-- TAB 3 -->
+    <div id="tab3" class="tab-content">
+        <div class="section-header"><h2 class="section-title">Solutions Pulse Intelligence (Producto Digital)</h2></div>
+        <div class="checklist-group">
+            <div class="check-item" id="item_t3_1" onclick="toggleCheck('t3_1')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-laura">Laura</span><span class="tag tag-date">Oct 23</span><span class="item-title">Diseño de Fase 1 (Solutions Pulse)</span></div><div class="item-desc">Definir la arquitectura de datos y maquetación de la primera fase de la app en Quick.</div></div></div>
+            <div class="check-item" id="item_t3_2" onclick="toggleCheck('t3_2')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-dani">Dani</span><span class="tag tag-date">Nov 01 - Nov 10</span><span class="item-title">Criterios de Asignación &amp; Gobernanza de Mapeo</span></div><div class="item-desc">Establecer las reglas de negocio, asignación de responsabilidades y la frecuencia de actualización.</div></div></div>
+            <div class="check-item" id="item_t3_3" onclick="toggleCheck('t3_3')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-laura">Laura</span><span class="tag tag-date">Nov 15 - Nov 30</span><span class="item-title">Módulo de Plan de Cuentas en App</span></div><div class="item-desc">Integrar el tablero de visualización de cuentas dentro de Solutions Pulse Intelligence.</div></div></div>
+        </div>
+    </div>
+
+    <!-- TAB 4 -->
+    <div id="tab4" class="tab-content">
+        <div class="section-header"><h2 class="section-title">Despliegue Regional &amp; Roadshows (Daniel)</h2></div>
+        <div class="checklist-group">
+            <div class="check-item" id="item_t4_1" onclick="toggleCheck('t4_1')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-dani">Dani</span><span class="tag tag-date">Oct 31</span><span class="item-title">Cierre Agenda con 5 Regiones Pendientes</span></div><div class="item-desc">Agendar formalmente las sesiones de Roadshow con los 5 gerentes regionales restantes.</div></div></div>
+            <div class="check-item" id="item_t4_2" onclick="toggleCheck('t4_2')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-dani">Dani</span><span class="tag tag-date">Nov 01 - Nov 10</span><span class="item-title">Habilitación 'Train the Trainer' (TTT)</span></div><div class="item-desc">Capacitar a los Champions de Soluciones asignados para garantizar un mensaje comercial unificado.</div></div></div>
+            <div class="check-item" id="item_t4_3" onclick="toggleCheck('t4_3')"><div class="circle-checkbox"><svg class="check-mark-svg" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg></div><div class="item-body"><div class="item-header-meta"><span class="tag tag-conjunto">Laura &amp; Dani</span><span class="tag tag-date">Recurrente</span><span class="item-title">Cadencia de Reuniones (1:1 &amp; Global)</span></div><div class="item-desc">Mantener las reuniones individuales semanales por región y la alineación colectiva quincenal.</div></div></div>
+        </div>
+    </div>
+
+    <footer>
+        <span>Base de datos compartida sincronizada automáticamente.</span>
+        <button class="btn-reset" onclick="resetAll()">Reiniciar Marcas</button>
+    </footer>
+</div>
+
+<script>
+    // ENDPOINT DE ALMACENAMIENTO DE NUBE GRATUITO CONFIGURADO PARA LAURA Y DANI
+    const API_URL = "https://api.jsonbin.io/v3/b/66f827e8acd3cb34a88dc25b";
+    let currentState = {};
+
+    async function fetchState() {
+        try {
+            document.getElementById('syncText').innerText = "Sincronizando...";
+            const response = await fetch(API_URL + "/latest", {
+                headers: { "X-Master-Key": "$2a$10$wT.M2O3R/E8K1S68zG54u.d0pL92yH6a5K4gH8YJ2Y4m.N1/8pD6C" }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                currentState = data.record || {};
+                updateUI(currentState);
+                document.getElementById('syncText').innerText = "Sincronizado";
+            }
+        } catch (e) {
+            document.getElementById('syncText').innerText = "Modo Local";
+        }
+    }
+
+    async function saveRemoteState() {
+        try {
+            document.getElementById('syncText').innerText = "Guardando...";
+            await fetch(API_URL, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Master-Key": "$2a$10$wT.M2O3R/E8K1S68zG54u.d0pL92yH6a5K4gH8YJ2Y4m.N1/8pD6C"
+                },
+                body: JSON.stringify(currentState)
+            });
+            document.getElementById('syncText').innerText = "Sincronizado";
+        } catch (e) {
+            document.getElementById('syncText').innerText = "Error de Red";
+        }
+    }
+
+    function toggleCheck(itemId) {
+        if (!currentState[itemId]) {
+            currentState[itemId] = true;
+            const itemCard = document.getElementById(`item_${itemId}`);
+            itemCard.classList.add('completed', 'just-completed');
+            setTimeout(() => itemCard.classList.remove('just-completed'), 600);
+        } else {
+            currentState[itemId] = false;
+        }
+        updateUI(currentState);
+        saveRemoteState();
+    }
+
+    function updateUI(state) {
+        const allItems = document.querySelectorAll(".check-item");
+        let totalCount = allItems.length;
+        let completedCount = 0;
+
+        allItems.forEach((item) => {
+            const id = item.id.replace("item_", "");
+            if (state[id]) {
+                item.classList.add("completed");
+                completedCount++;
+            } else {
+                item.classList.remove("completed");
+            }
+        });
+
+        const percent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+        document.getElementById("progressBar").style.width = percent + "%";
+        document.getElementById("progressText").innerText = `${completedCount} / ${totalCount} (${percent}%)`;
+
+        const tabs = ["tab1", "tab2", "tab3", "tab4"];
+        tabs.forEach((tId) => {
+            const tabEl = document.getElementById(tId);
+            const items = tabEl.querySelectorAll(".check-item");
+            let tTotal = items.length;
+            let tDone = 0;
+            items.forEach((it) => { if (it.classList.contains("completed")) tDone++; });
+            document.getElementById("badge-" + tId).innerText = `${tDone}/${tTotal}`;
+        });
+    }
+
+    function resetAll() {
+        if (confirm('¿Deseas reiniciar todas las marcas del roadmap para ambos?')) {
+            currentState = {};
+            updateUI(currentState);
+            saveRemoteState();
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll(".tab-button").forEach((button) => {
+            button.addEventListener("click", function (e) {
+                e.preventDefault();
+                const targetTabId = this.getAttribute("data-tab");
+                document.querySelectorAll(".tab-button").forEach((btn) => btn.classList.remove("active"));
+                document.querySelectorAll(".tab-content").forEach((content) => content.classList.remove("active"));
+                this.classList.add("active");
+                document.getElementById(targetTabId).classList.add("active");
+            });
+        });
+
+        fetchState();
+        setInterval(fetchState, 5000); // Poll automático cada 5 segundos
+    });
+</script>
+
+
+</body></html>
