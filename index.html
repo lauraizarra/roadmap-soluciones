@@ -162,29 +162,76 @@
 <script>
     // ENDPOINT DE ALMACENAMIENTO DE NUBE GRATUITO CONFIGURADO PARA LAURA Y DANI
     const API_URL = "https://api.jsonbin.io/v3/b/66f827e8acd3cb34a88dc25b";
+    const LOCAL_STORAGE_KEY = "roadmapSolucionesState";
     let currentState = {};
+
+    function readLocalState() {
+        try {
+            const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (!savedState) return {};
+            const parsedState = JSON.parse(savedState);
+            return parsedState && typeof parsedState === "object" && !Array.isArray(parsedState)
+                ? parsedState
+                : {};
+        } catch (e) {
+            document.getElementById('syncText').innerText = "No se pudo leer el estado local";
+            return {};
+        }
+    }
+
+    function saveLocalState() {
+        try {
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentState));
+            return true;
+        } catch (e) {
+            document.getElementById('syncText').innerText = "Error al guardar localmente";
+            return false;
+        }
+    }
+
+    async function requestWithTimeout(url, options) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        try {
+            return await fetch(url, { ...options, signal: controller.signal });
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
 
     async function fetchState() {
         try {
             document.getElementById('syncText').innerText = "Sincronizando...";
-            const response = await fetch(API_URL + "/latest", {
+            const response = await requestWithTimeout(API_URL + "/latest", {
                 headers: { "X-Master-Key": "$2a$10$wT.M2O3R/E8K1S68zG54u.d0pL92yH6a5K4gH8YJ2Y4m.N1/8pD6C" }
             });
-            if (response.ok) {
-                const data = await response.json();
-                currentState = data.record || {};
-                updateUI(currentState);
-                document.getElementById('syncText').innerText = "Sincronizado";
+            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
+
+            const data = await response.json();
+            const remoteState = data.record && typeof data.record === "object" && !Array.isArray(data.record)
+                ? data.record
+                : {};
+            currentState = { ...remoteState, ...currentState };
+            updateUI(currentState);
+            if (!saveLocalState()) return;
+
+            const localHasState = Object.keys(currentState).length > 0;
+            const remoteMatches = JSON.stringify(remoteState) === JSON.stringify(currentState);
+            if (localHasState && !remoteMatches) {
+                await saveRemoteState();
+                return;
             }
+            document.getElementById('syncText').innerText = "Sincronizado";
         } catch (e) {
-            document.getElementById('syncText').innerText = "Modo Local";
+            document.getElementById('syncText').innerText = "Guardado localmente (sin conexión)";
         }
     }
 
     async function saveRemoteState() {
+        if (!saveLocalState()) return;
         try {
             document.getElementById('syncText').innerText = "Guardando...";
-            await fetch(API_URL, {
+            const response = await requestWithTimeout(API_URL, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -192,9 +239,10 @@
                 },
                 body: JSON.stringify(currentState)
             });
+            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
             document.getElementById('syncText').innerText = "Sincronizado";
         } catch (e) {
-            document.getElementById('syncText').innerText = "Error de Red";
+            document.getElementById('syncText').innerText = "Guardado localmente (sin conexión)";
         }
     }
 
@@ -261,8 +309,9 @@
             });
         });
 
+        currentState = readLocalState();
+        updateUI(currentState);
         fetchState();
-        setInterval(fetchState, 5000); // Poll automático cada 5 segundos
     });
 </script>
 
