@@ -160,8 +160,7 @@
 </div>
 
 <script>
-    // ENDPOINT DE ALMACENAMIENTO DE NUBE GRATUITO CONFIGURADO PARA LAURA Y DANI
-    const API_URL = "https://api.jsonbin.io/v3/b/66f827e8acd3cb34a88dc25b";
+    const SYNC_API_URL = "https://roadmap-soluciones-sync.roadmap-soluciones-laura.workers.dev";
     const LOCAL_STORAGE_KEY = "roadmapSolucionesState";
     const SYNC_INTERVAL_MS = 5000;
     let currentState = {};
@@ -214,11 +213,13 @@
 
     async function fetchState() {
         if (isFetchingState || isSavingState) return;
+        if (!SYNC_API_URL) {
+            document.getElementById('syncText').innerText = "Falta configurar el Worker";
+            return;
+        }
         isFetchingState = true;
         try {
-            const response = await requestWithTimeout(API_URL + "/latest", {
-                headers: { "X-Master-Key": "$2a$10$wT.M2O3R/E8K1S68zG54u.d0pL92yH6a5K4gH8YJ2Y4m.N1/8pD6C" }
-            });
+            const response = await requestWithTimeout(SYNC_API_URL + "/latest", {});
             if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
 
             const data = await response.json();
@@ -235,7 +236,7 @@
             }
             document.getElementById('syncText').innerText = "En vivo";
         } catch (e) {
-            document.getElementById('syncText').innerText = "Sin conexión; cambios guardados localmente";
+            document.getElementById('syncText').innerText = `${e.message}; cambios guardados localmente`;
         } finally {
             isFetchingState = false;
         }
@@ -243,6 +244,10 @@
 
     async function saveRemoteState() {
         if (!saveLocalState()) return;
+        if (!SYNC_API_URL) {
+            document.getElementById('syncText').innerText = "Falta configurar el Worker; cambios guardados localmente";
+            return;
+        }
         if (isSavingState) return;
         isSavingState = true;
         try {
@@ -250,11 +255,10 @@
                 document.getElementById('syncText').innerText = "Guardando...";
                 const stateToSave = { ...currentState };
                 const changesToSave = { ...pendingChanges };
-                const response = await requestWithTimeout(API_URL, {
+                const response = await requestWithTimeout(SYNC_API_URL, {
                     method: "PUT",
                     headers: {
-                        "Content-Type": "application/json",
-                        "X-Master-Key": "$2a$10$wT.M2O3R/E8K1S68zG54u.d0pL92yH6a5K4gH8YJ2Y4m.N1/8pD6C"
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify(stateToSave)
                 });
@@ -267,7 +271,7 @@
             }
             document.getElementById('syncText').innerText = "En vivo";
         } catch (e) {
-            document.getElementById('syncText').innerText = "Sin conexión; cambios guardados localmente";
+            document.getElementById('syncText').innerText = `${e.message}; cambios guardados localmente`;
         } finally {
             isSavingState = false;
         }

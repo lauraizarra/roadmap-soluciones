@@ -1,0 +1,12 @@
+name = "roadmap-soluciones-sync"
+main = "worker.js"
+compatibility_date = "2026-10-20"
+
+[vars]
+ALLOWED_ORIGIN = "https://lauraizarra.github.io"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "roadmap-soluciones-sync"
+database_id = "6e6c3f80-1aea-4745-b2af-2bd683343964"
+migrations_dir = "migrations"
