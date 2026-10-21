@@ -102,7 +102,7 @@
         <span class="progress-label">Evolución Global:</span>
         <div class="progress-bar-container"><div class="progress-bar-fill" id="progressBar"></div></div>
         <div class="progress-text" id="progressText">0 / 0 (0%)</div>
-        <div class="sync-status"><div class="sync-dot"></div> <span id="syncText">Sincronizando...</span></div>
+        <div class="sync-status"><div class="sync-dot"></div> <span id="syncText">Conectando...</span></div>
     </div>
 
     <nav class="tabs-nav">
@@ -163,16 +163,26 @@
     // ENDPOINT DE ALMACENAMIENTO DE NUBE GRATUITO CONFIGURADO PARA LAURA Y DANI
     const API_URL = "https://api.jsonbin.io/v3/b/66f827e8acd3cb34a88dc25b";
     const LOCAL_STORAGE_KEY = "roadmapSolucionesState";
+    const SYNC_INTERVAL_MS = 5000;
     let currentState = {};
+    let pendingChanges = {};
+    let isFetchingState = false;
+    let isSavingState = false;
 
     function readLocalState() {
         try {
             const savedState = localStorage.getItem(LOCAL_STORAGE_KEY);
             if (!savedState) return {};
-            const parsedState = JSON.parse(savedState);
-            return parsedState && typeof parsedState === "object" && !Array.isArray(parsedState)
-                ? parsedState
-                : {};
+            const parsed = JSON.parse(savedState);
+            if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+            if (parsed.state && typeof parsed.state === "object" && !Array.isArray(parsed.state)) {
+                pendingChanges = parsed.pending && typeof parsed.pending === "object" && !Array.isArray(parsed.pending)
+                    ? parsed.pending
+                    : {};
+                return parsed.state;
+            }
+            pendingChanges = { ...parsed };
+            return parsed;
         } catch (e) {
             document.getElementById('syncText').innerText = "No se pudo leer el estado local";
             return {};
@@ -181,7 +191,10 @@
 
     function saveLocalState() {
         try {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentState));
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({
+                state: currentState,
+                pending: pendingChanges
+            }));
             return true;
         } catch (e) {
             document.getElementById('syncText').innerText = "Error al guardar localmente";
@@ -200,8 +213,9 @@
     }
 
     async function fetchState() {
+        if (isFetchingState || isSavingState) return;
+        isFetchingState = true;
         try {
-            document.getElementById('syncText').innerText = "Sincronizando...";
             const response = await requestWithTimeout(API_URL + "/latest", {
                 headers: { "X-Master-Key": "$2a$10$wT.M2O3R/E8K1S68zG54u.d0pL92yH6a5K4gH8YJ2Y4m.N1/8pD6C" }
             });
@@ -211,38 +225,51 @@
             const remoteState = data.record && typeof data.record === "object" && !Array.isArray(data.record)
                 ? data.record
                 : {};
-            currentState = { ...remoteState, ...currentState };
+            currentState = { ...remoteState, ...pendingChanges };
             updateUI(currentState);
             if (!saveLocalState()) return;
 
-            const localHasState = Object.keys(currentState).length > 0;
-            const remoteMatches = JSON.stringify(remoteState) === JSON.stringify(currentState);
-            if (localHasState && !remoteMatches) {
+            if (Object.keys(pendingChanges).length > 0) {
                 await saveRemoteState();
                 return;
             }
-            document.getElementById('syncText').innerText = "Sincronizado";
+            document.getElementById('syncText').innerText = "En vivo";
         } catch (e) {
-            document.getElementById('syncText').innerText = "Guardado localmente (sin conexión)";
+            document.getElementById('syncText').innerText = "Sin conexión; cambios guardados localmente";
+        } finally {
+            isFetchingState = false;
         }
     }
 
     async function saveRemoteState() {
         if (!saveLocalState()) return;
+        if (isSavingState) return;
+        isSavingState = true;
         try {
-            document.getElementById('syncText').innerText = "Guardando...";
-            const response = await requestWithTimeout(API_URL, {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Master-Key": "$2a$10$wT.M2O3R/E8K1S68zG54u.d0pL92yH6a5K4gH8YJ2Y4m.N1/8pD6C"
-                },
-                body: JSON.stringify(currentState)
-            });
-            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
-            document.getElementById('syncText').innerText = "Sincronizado";
+            while (Object.keys(pendingChanges).length > 0) {
+                document.getElementById('syncText').innerText = "Guardando...";
+                const stateToSave = { ...currentState };
+                const changesToSave = { ...pendingChanges };
+                const response = await requestWithTimeout(API_URL, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Master-Key": "$2a$10$wT.M2O3R/E8K1S68zG54u.d0pL92yH6a5K4gH8YJ2Y4m.N1/8pD6C"
+                    },
+                    body: JSON.stringify(stateToSave)
+                });
+                if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
+
+                Object.entries(changesToSave).forEach(([itemId, value]) => {
+                    if (pendingChanges[itemId] === value) delete pendingChanges[itemId];
+                });
+                saveLocalState();
+            }
+            document.getElementById('syncText').innerText = "En vivo";
         } catch (e) {
-            document.getElementById('syncText').innerText = "Guardado localmente (sin conexión)";
+            document.getElementById('syncText').innerText = "Sin conexión; cambios guardados localmente";
+        } finally {
+            isSavingState = false;
         }
     }
 
@@ -255,6 +282,7 @@
         } else {
             currentState[itemId] = false;
         }
+        pendingChanges[itemId] = currentState[itemId];
         updateUI(currentState);
         saveRemoteState();
     }
@@ -291,7 +319,13 @@
 
     function resetAll() {
         if (confirm('¿Deseas reiniciar todas las marcas del roadmap para ambos?')) {
+            pendingChanges = {};
             currentState = {};
+            document.querySelectorAll(".check-item").forEach((item) => {
+                const itemId = item.id.replace("item_", "");
+                currentState[itemId] = false;
+                pendingChanges[itemId] = false;
+            });
             updateUI(currentState);
             saveRemoteState();
         }
@@ -312,6 +346,7 @@
         currentState = readLocalState();
         updateUI(currentState);
         fetchState();
+        setInterval(fetchState, SYNC_INTERVAL_MS);
     });
 </script>
 
